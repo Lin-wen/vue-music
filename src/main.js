@@ -14,7 +14,7 @@ fastclick.attach(document.body)
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: 'dist/error.png',
-  loading: 'dist/loading.gif',
+  loading: require('common/image/default.png'),
   attempt: 1
 })
 

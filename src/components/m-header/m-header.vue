@@ -20,7 +20,7 @@ export default {
     text-align: center
     color: $color-text
     font-size: 0
-    background-color: #31c27c;
+    background-color: #31c27c
     .icon
       display: inline-block
       vertical-align: top
