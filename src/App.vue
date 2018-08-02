@@ -34,7 +34,7 @@ body
   color: $color-theme
   .tab
     display: flex
-    background-color: #31c27c
+    background-color: #f86166
     .tab-item
       position: relative
       flex: 1

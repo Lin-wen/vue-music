@@ -13,13 +13,20 @@
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle">
-          <div class="middle-l">
+          <div class="middle-l" :class="{'active':!showLyric}" @click="toggleShowLyric">
             <div class="cd-wrapper" ref="cdwrapper">
               <div class="cd" :class="cdCls">
                 <img :src="currentSong.image" class="image">
               </div>
             </div>
           </div>
+          <scroll :data="currentLyric&&currentLyric.lines"  :class="{'active': showLyric}" class="middle-r" ref="lyricList">
+            <div class="lyric-wrapper" @click="toggleShowLyric">
+              <div class="currentLyric">
+                <p ref="lyricLine" class="text" :class="{'current': currentLineNum == index}" v-for="(line, index) in currentLyric.lines" :key="index">{{line.txt}}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
@@ -80,6 +87,8 @@ import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
+import LyricParser from 'lyric-parser'
+import Scroll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
 
@@ -87,7 +96,10 @@ export default {
   data () {
     return {
       songReady: false,
-      currentTime: 0
+      currentTime: 0,
+      currentLyric: {},
+      currentLineNum: 0,
+      showLyric: false
     }
   },
   computed: {
@@ -176,6 +188,9 @@ export default {
         x, y, scale
       }
     },
+    toggleShowLyric () {
+      this.showLyric = !this.showLyric
+    },
     togglePlaying () {
       this.setPlayingState(!this.playing)
     },
@@ -261,6 +276,23 @@ export default {
       }
       return num
     },
+    getLyric () {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new LyricParser(lyric, this.handleLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+      })
+    },
+    handleLyric ({lineNum, txt}) {
+      this.currentLineNum = lineNum
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyricLine[lineNum - 5]
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
+      }
+    },
     onProgressBarChange (percent) {
       this.$refs.audio.currentTime = this.currentSong.duration * percent
       if (!this.playing) {
@@ -282,6 +314,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
+        this.getLyric()
       })
     },
     playing (newPalying) {
@@ -293,7 +326,8 @@ export default {
   },
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   }
 }
 </script>
@@ -356,12 +390,15 @@ export default {
         white-space: nowrap
         font-size: 0
         .middle-l
-          display: inline-block
-          vertical-align: top
+          display: block
+          // vertical-align: top
           position: relative
           width: 100%
           height: 0
           padding-top: 80%
+          opacity: 0
+          &.active
+            opacity: 1
           .cd-wrapper
             position: absolute
             left: 10%
@@ -397,11 +434,17 @@ export default {
               font-size: $font-size-medium
               color: $color-text-l
         .middle-r
-          display: inline-block
-          vertical-align: top
+          position: absolute
+          left: 0
+          top: 0
+          display: block
+          // vertical-align: top
           width: 100%
           height: 100%
           overflow: hidden
+          opacity: 0
+          &.active
+            opacity: 1
           .lyric-wrapper
             width: 80%
             margin: 0 auto

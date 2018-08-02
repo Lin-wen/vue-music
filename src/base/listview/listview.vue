@@ -221,7 +221,7 @@ export default {
         color: #222
         font-size: $font-size-small
         &.current
-          color: #31c27c
+          color: #f86166
     .list-fixed
       position: absolute
       top: 0

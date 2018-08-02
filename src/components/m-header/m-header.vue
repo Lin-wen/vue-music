@@ -1,7 +1,7 @@
 <template>
   <div class="m-header">
     <div class="icon"></div>
-    <h1 class="text">QQ音乐</h1>
+    <h1 class="text">MUSIC</h1>
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
     text-align: center
     color: $color-text
     font-size: 0
-    background-color: #31c27c
+    background-color: #f86166
     .icon
       display: inline-block
       vertical-align: top
