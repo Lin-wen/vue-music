@@ -12,16 +12,19 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <div class="middle-l" :class="{'active':!showLyric}" @click="toggleShowLyric">
+        <div class="middle" @click="toggleShowLyric">
+          <div class="middle-l" :class="{'active':!showLyric}">
             <div class="cd-wrapper" ref="cdwrapper">
               <div class="cd" :class="cdCls">
                 <img :src="currentSong.image" class="image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll :data="currentLyric&&currentLyric.lines"  :class="{'active': showLyric}" class="middle-r" ref="lyricList">
-            <div class="lyric-wrapper" @click="toggleShowLyric">
+            <div class="lyric-wrapper">
               <div class="currentLyric">
                 <p ref="lyricLine" class="text" :class="{'current': currentLineNum == index}" v-for="(line, index) in currentLyric.lines" :key="index">{{line.txt}}</p>
               </div>
@@ -99,7 +102,8 @@ export default {
       currentTime: 0,
       currentLyric: {},
       currentLineNum: 0,
-      showLyric: false
+      showLyric: false,
+      playingLyric: ''
     }
   },
   computed: {
@@ -192,7 +196,15 @@ export default {
       this.showLyric = !this.showLyric
     },
     togglePlaying () {
+      if (!this.songReady) {
+        return
+      }
+
       this.setPlayingState(!this.playing)
+
+      if (JSON.stringify(this.currentLyric) !== '{}') {
+        this.currentLyric.togglePlay()
+      }
     },
     changMode () {
       let mode = (this.mode + 1) % 3
@@ -217,13 +229,17 @@ export default {
         return
       }
 
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playList.length - 1
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playList.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playList.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
 
       this.songReady = false
@@ -232,14 +248,17 @@ export default {
       if (!this.songReady) {
         return
       }
-
-      let index = this.currentIndex + 1
-      if (index === this.playList.length) {
-        index = 0
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playList.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
 
       this.songReady = false
@@ -254,6 +273,9 @@ export default {
     loop () {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+      if (JSON.stringify(this.currentLyric) !== '{}') {
+        this.currentLyric.seek(0)
+      }
     },
     ready () {
       this.songReady = true
@@ -282,6 +304,10 @@ export default {
         if (this.playing) {
           this.currentLyric.play()
         }
+      }).catch(() => {
+        this.currentLyric = {}
+        this.playingLyric = ''
+        this.currentLineNum = 0
       })
     },
     handleLyric ({lineNum, txt}) {
@@ -292,11 +318,16 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     onProgressBarChange (percent) {
-      this.$refs.audio.currentTime = this.currentSong.duration * percent
+      const currentTime = this.currentSong.duration * percent
+      this.$refs.audio.currentTime = currentTime
       if (!this.playing) {
         this.togglePlaying()
+      }
+      if (JSON.stringify(this.currentLyric) !== '{}') {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     ...mapMutations({
@@ -312,10 +343,14 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      this.$nextTick(() => {
+      if (JSON.stringify(this.currentLyric) !== '{}') {
+        this.currentLyric.stop()
+      }
+
+      setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
-      })
+      }, 1000)
     },
     playing (newPalying) {
       const audio = this.$refs.audio
@@ -397,6 +432,7 @@ export default {
           height: 0
           padding-top: 80%
           opacity: 0
+          transition: all .3s .2s ease
           &.active
             opacity: 1
           .cd-wrapper
@@ -443,6 +479,7 @@ export default {
           height: 100%
           overflow: hidden
           opacity: 0
+          transition: all .3s .2s ease
           &.active
             opacity: 1
           .lyric-wrapper
