@@ -5,22 +5,13 @@
         <div class="slider-wrapper">
           <slider :slider="slider"></slider>
         </div>
-        <div class="title">电台</div>
-        <div class="radioList-wrapper">
-          <div class="radioList-item" v-for="item in radioList" :key="item.Ftitle">
-            <div class="img-wrapper">
-              <img v-lazy="item.picUrl" alt="">
-            </div>
-            <span class="name">{{ item.Ftitle }}</span>
-          </div>
-        </div>
         <div class="title">热门歌单</div>
         <div class="songList-wrapper">
-          <div class="songList-item" v-for="item in songList" :key="item.id">
+          <div class="songList-item" v-for="item in songList" :key="item.dissid" @click="selectItem(item)">
             <div class="img-wrapper">
-              <img v-lazy="item.picUrl" alt="">
+              <img v-lazy="item.imgurl" alt="">
             </div>
-            <span class="name">{{ item.songListDesc }}</span>
+            <span class="name">{{ item.dissname }}</span>
           </div>
         </div>
       </div>
@@ -29,6 +20,7 @@
         <loading></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -36,10 +28,10 @@
 import Scroll from 'base/scroll/scroll'
 import Slider from 'base/slider/slider'
 import Loading from 'base/loading/loading'
-// import {getRecommend, getDiscList} from 'api/recommend'
-import {getRecommend} from 'api/recommend'
+import {getRecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
 import {playlistMixin} from 'common/js/mixin'
+import {mapMutations} from 'vuex'
 
 export default {
   mixins: [
@@ -48,13 +40,12 @@ export default {
   data () {
     return {
       slider: [],
-      radioList: [],
       songList: []
     }
   },
   created () {
     this._getRecommend()
-    // this._getDiscList()
+    this._getDiscList()
   },
   methods: {
     handlePlaylist (playList) {
@@ -66,18 +57,26 @@ export default {
       getRecommend().then((res) => {
         if (res.code === ERR_OK) {
           this.slider = res.data.slider
-          this.radioList = res.data.radioList
-          this.songList = res.data.songList
         }
       })
-    }
-    // _getDiscList () {
-    //   getDiscList().then((res) => {
-    //     if (res.code === ERR_OK) {
-    //       console.log(res.data)
-    //     }
-    //   })
-    // }
+    },
+    _getDiscList () {
+      getDiscList().then((res) => {
+        if (res.code === ERR_OK) {
+          this.songList = res.data.list
+          // console.log(this.songList)
+        }
+      })
+    },
+    selectItem (item) {
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
+      this.setDisc(item)
+    },
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    })
   },
   components: {
     Slider,
@@ -131,11 +130,11 @@ export default {
       box-sizing: border-box
       .songList-item
         margin-bottom: 10px
-        width: 170px
+        width: 110px
         background-color: #fff
         .img-wrapper
-          width: 170px
-          height: 170px
+          width: 110px
+          height: 110px
           img
             width: 100%
             height: 100%
@@ -144,7 +143,7 @@ export default {
           padding: 5px
           height: 50px
           box-sizing: border-box
-          font-size: 14px
+          font-size: 12px
           line-height: 1.5
           color: #333
       .songList-item:nth-of-type(2n)
