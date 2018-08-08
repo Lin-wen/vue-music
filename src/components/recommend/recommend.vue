@@ -3,9 +3,12 @@
     <scroll class="recommend-content" :data="songList" ref="scroll">
       <div>
         <div class="slider-wrapper">
-          <slider :slider="slider"></slider>
+          <div class="slide-bg"></div>
+          <div class="slide">
+            <slider :slider="slider"></slider>
+          </div>
         </div>
-        <div class="title">热门歌单</div>
+        <div class="title">推荐歌单</div>
         <div class="songList-wrapper">
           <div class="songList-item" v-for="item in songList" :key="item.dissid" @click="selectItem(item)">
             <div class="img-wrapper">
@@ -96,61 +99,52 @@ export default {
     .recommend-content
       height: 100%
       overflow: hidden
-    .title
-      padding: 10px 10px 0
-      color: #333
-      line-height: 2.0
-    .radioList-wrapper
-      display: flex
-      justify-content: space-between
-      padding: 10px
-      box-sizing: border-box
-      .radioList-item
-        width: 170px
-        background-color: #fff
-        .img-wrapper
-          width: 170px
-          height: 170px
-          img
-            width: 100%
-            height: 100%
-        .name
-          display: block
-          padding: 5px
-          height: 50px
-          box-sizing: border-box
-          font-size: 14px
-          line-height: 1.5
-          color: #333
-    .songList-wrapper
-      display: flex
-      flex-wrap: wrap;
-      justify-content: space-between
-      padding: 10px
-      box-sizing: border-box
-      .songList-item
-        margin-bottom: 10px
-        width: 110px
-        background-color: #fff
-        .img-wrapper
+      .slider-wrapper
+        position relative
+        padding: 0 10px
+        .slide-bg
+          position: absolute
+          left: 0
+          top: 0
+          width: 100%
+          height: 80px
+          background-color: #f86166
+        .slide
+          border-radius: 8px
+          overflow: hidden
+      .title
+        padding: 10px 10px 0
+        color: #333
+        line-height: 2.0
+      .songList-wrapper
+        display: flex
+        flex-wrap: wrap;
+        justify-content: space-between
+        padding: 10px
+        box-sizing: border-box
+        .songList-item
+          margin-bottom: 10px
           width: 110px
-          height: 110px
-          img
-            width: 100%
-            height: 100%
-        .name
-          display: block
-          padding: 5px
-          height: 50px
-          box-sizing: border-box
-          font-size: 12px
-          line-height: 1.5
-          color: #333
-      .songList-item:nth-of-type(2n)
-        margin-left: 0
-    .loading-container
-      position: absolute
-      width: 100%
-      top: 50%
-      transform: translateY(-50%)
+          background-color: #fff
+          .img-wrapper
+            width: 110px
+            height: 110px
+            img
+              width: 100%
+              height: 100%
+          .name
+            display: block
+            padding: 5px
+            height: 50px
+            box-sizing: border-box
+            font-size: 12px
+            line-height: 1.5
+            color: #333
+        .songList-item:nth-of-type(2n)
+          margin-left: 0
+      .loading-container
+        position: absolute
+        width: 100%
+        top: 50%
+        transform: translateY(-50%)
 </style>

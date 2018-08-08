@@ -28,6 +28,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   devServer: {
     // 接口代理
     before (app) {
+      // 获取歌单列表
       app.get('/api/getDiscList', function (req, res) {
         var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
 
@@ -43,7 +44,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           console.log(e)
         })
       })
-
+      // 获取歌单详情
       app.get('/api/getDiscDetail', function (req, res) {
         var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
 
@@ -59,7 +60,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           console.log(e)
         })
       })
-
+      // 获取歌词
       app.get('/api/lyric', function (req, res) {
         var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
         
@@ -80,6 +81,38 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           }
           // res.json(response.data)
           res.json(ret)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+      // 获取榜单列表
+      app.get('/api/getRanking', function (req, res) {
+        var url = 'https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg'
+
+        axios.get(url, {
+          headers: {
+            referer: 'https://y.qq.com/',
+            host: 'c.y.qq.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+      // 获取榜单歌曲列表
+      app.get('/api/getTopList', function (req, res) {
+        var url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg'
+
+        axios.get(url, {
+          headers: {
+            referer: 'https://y.qq.com/',
+            host: 'c.y.qq.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
         }).catch((e) => {
           console.log(e)
         })

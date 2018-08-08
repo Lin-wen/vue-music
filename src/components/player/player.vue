@@ -387,8 +387,8 @@ export default {
         width: 100%
         height: 100%
         z-index: -1
-        opacity: 0.6
-        filter: blur(20px)
+        opacity: 0.8
+        filter: blur(50px)
         background-color: #000
       .top
         position: relative
