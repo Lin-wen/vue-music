@@ -31,7 +31,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       // 获取歌单列表
       app.get('/api/getDiscList', function (req, res) {
         var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
-
+        
         axios.get(url, {
           headers: {
             referer: 'https://y.qq.com/',
@@ -104,6 +104,22 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       // 获取榜单歌曲列表
       app.get('/api/getTopList', function (req, res) {
         var url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg'
+
+        axios.get(url, {
+          headers: {
+            referer: 'https://y.qq.com/',
+            host: 'c.y.qq.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+      // 搜索
+      app.get('/api/search', function (req, res) {
+        var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
 
         axios.get(url, {
           headers: {
