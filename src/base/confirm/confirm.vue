@@ -1,6 +1,10 @@
 <template>
   <transition name="confirm-fade">
+<<<<<<< HEAD
     <div class="confirm" v-show="showFlag" @click.stop>
+=======
+    <div class="confirm" v-show="showFlag">
+>>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c
       <div class="confirm-wrapper">
         <div class="confirm-content">
           <p class="text">{{text}}</p>

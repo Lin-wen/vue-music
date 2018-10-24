@@ -89,6 +89,7 @@ export const deleteSearchHistory = function ({commit}, keyword) {
 export const clearSearchHistory = function ({commit}) {
   commit(types.SET_SEARCH_HISTORY, clearSearch())
 }
+<<<<<<< HEAD
 
 export const deleteSong = function ({commit, state}, song) {
   let playList = state.playList.slice()
@@ -118,3 +119,5 @@ export const clearSongList = function ({commit}) {
   commit(types.SET_CURRENT_INDEX, -1)
   commit(types.SET_PLAYING_STATE, false)
 }
+=======
+>>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c

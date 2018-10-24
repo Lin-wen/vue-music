@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import {mapGetters, mapMutations} from 'vuex'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
+=======
+import {mapGetters} from 'vuex'
+>>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c
 
 export const playlistMixin = {
   computed: {
@@ -25,6 +29,7 @@ export const playlistMixin = {
     }
   }
 }
+<<<<<<< HEAD
 
 export const playerMixin = {
   computed: {
@@ -65,3 +70,5 @@ export const playerMixin = {
     })
   }
 }
+=======
+>>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c
