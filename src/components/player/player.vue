@@ -53,7 +53,7 @@
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon icon-not-favorite"></i>
+              <i class="icon icon-not-favorite" :class="getFavoriteIcon(currentSong)" @click="toggleFavorite(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -79,12 +79,12 @@
       </div>
     </transition>
     <play-list ref="playlist"></play-list>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapActions} from 'vuex'
 import animations from 'create-keyframe-animation'
 import {prefixStyle} from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
@@ -198,7 +198,7 @@ export default {
 
       this.setPlayingState(!this.playing)
 
-      if (JSON.stringify(this.currentLyric) !== '{}') {
+      if (this.currentLyric.lines) {
         this.currentLyric.togglePlay()
       }
     },
@@ -209,6 +209,7 @@ export default {
 
       if (this.playList.length === 1) {
         this.loop()
+        return
       } else {
         let index = this.currentIndex - 1
         if (index === -1) {
@@ -228,6 +229,7 @@ export default {
       }
       if (this.playList.length === 1) {
         this.loop()
+        return
       } else {
         let index = this.currentIndex + 1
         if (index === this.playList.length) {
@@ -251,7 +253,7 @@ export default {
     loop () {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
-      if (JSON.stringify(this.currentLyric) !== '{}') {
+      if (this.currentLyric.lines) {
         this.currentLyric.seek(0)
       }
     },
@@ -260,6 +262,8 @@ export default {
     },
     ready () {
       this.songReady = true
+      // 计入播放历史
+      this.setPlayHistroy(this.currentSong)
     },
     error () {
       this.songReady = true
@@ -281,6 +285,9 @@ export default {
     },
     getLyric () {
       this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new LyricParser(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -307,13 +314,17 @@ export default {
       if (!this.playing) {
         this.togglePlaying()
       }
-      if (JSON.stringify(this.currentLyric) !== '{}') {
+      // if (JSON.stringify(this.currentLyric) !== '{}') {
+      if (this.currentLyric.lines) {
         this.currentLyric.seek(currentTime * 1000)
       }
     },
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCREEN'
-    })
+    }),
+    ...mapActions([
+      'setPlayHistroy'
+    ])
   },
   watch: {
     currentSong (newSong, oldSong) {
@@ -323,11 +334,15 @@ export default {
       if (newSong.id === oldSong.id) {
         return
       }
-      if (JSON.stringify(this.currentLyric) !== '{}') {
+      if (this.currentLyric.lines) {
         this.currentLyric.stop()
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
 
-      setTimeout(() => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
       }, 1000)

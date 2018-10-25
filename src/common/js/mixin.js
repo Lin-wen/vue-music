@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapActions} from 'vuex'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
-=======
-import {mapGetters} from 'vuex'
->>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c
 
 export const playlistMixin = {
   computed: {
@@ -29,7 +25,6 @@ export const playlistMixin = {
     }
   }
 }
-<<<<<<< HEAD
 
 export const playerMixin = {
   computed: {
@@ -40,7 +35,8 @@ export const playerMixin = {
       'playList',
       'sequenceList',
       'currentSong',
-      'mode'
+      'mode',
+      'favoriteList'
     ])
   },
   methods: {
@@ -62,6 +58,29 @@ export const playerMixin = {
       })
       this.setCurrentIndex(index)
     },
+    getFavoriteIcon (song) {
+      if (this.isFavorite(song)) {
+        return 'icon-favorite'
+      }
+      return 'icon-no-favorite'
+    },
+    toggleFavorite (song) {
+      if (this.isFavorite(song)) {
+        this.deleteFavoriteList(song)
+      } else {
+        this.saveFavoriteList(song)
+      }
+    },
+    isFavorite (song) {
+      const index = this.favoriteList.findIndex((item) => {
+        return item.id === song.id
+      })
+      return index > -1
+    },
+    ...mapActions([
+      'saveFavoriteList',
+      'deleteFavoriteList'
+    ]),
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
@@ -70,5 +89,3 @@ export const playerMixin = {
     })
   }
 }
-=======
->>>>>>> 5eb45247739a4208ee2ea136e1da2c1ccc8d2f2c

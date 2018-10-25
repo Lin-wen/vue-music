@@ -9,7 +9,7 @@
             <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <scroll ref="listContent" :data="sequenceList" class="list-content">
+        <scroll ref="listContent" :data="sequenceList" :refreshDelay="refreshDelay" class="list-content">
           <transition-group name="list" tag="ul">
             <li class="item" v-for="(item, index) in sequenceList" :key="item.id" @click="selectItem(item, index)">
               <i class="current" :class="getCurrentIcon(item)"></i>
@@ -23,12 +23,6 @@
             </li>
           </transition-group>
         </scroll>
-        <div class="list-operate">
-          <div class="add">
-            <i class="icon-add"></i>
-            <span class="text">添加歌曲到队列</span>
-          </div>
-        </div>
         <div class="list-close" @click="hide">
           <span>关闭</span>
         </div>
@@ -49,7 +43,8 @@ export default {
   mixins: [playerMixin],
   data () {
     return {
-      showFlag: false
+      showFlag: false,
+      refreshDelay: 100
     }
   },
   computed: {
@@ -133,10 +128,12 @@ export default {
       left: 0
       bottom: 0
       width: 100%
-      background-color: $color-highlight-background
+      background-color: #fff
+      border-radius: 10px 10px 0 0
       .list-header
         position: relative
-        padding: 20px 30px 15px 20px
+        padding: 15px 30px 15px 15px
+        border-bottom: 1px solid #eee
         .title
           display: flex
           align-items: center
